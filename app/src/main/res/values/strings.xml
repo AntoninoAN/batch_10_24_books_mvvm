@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">BookApiSearch</string>
+    <string name="search_books_by_title">Search books by title</string>
+    <string name="book_title_header"><b>Book title:</b> \n%1$s</string>
+    <string name="no_books_has_been_found">No books has been found.</string>
+</resources>
