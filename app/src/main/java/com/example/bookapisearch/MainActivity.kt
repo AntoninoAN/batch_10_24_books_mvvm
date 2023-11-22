@@ -1,25 +1,36 @@
 package com.example.bookapisearch
 
+import android.content.res.Resources
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.StrictMode
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN
+import androidx.lifecycle.ViewModelProvider
 import com.example.bookapisearch.model.RepositoryImpl
 import com.example.bookapisearch.model.remote.Network
 import com.example.bookapisearch.view.BookDisplayFragment
 import com.example.bookapisearch.view.BookSearchFragment
+import com.example.bookapisearch.viewmodel.BookSearchViewModel
 
 class MainActivity : AppCompatActivity(), BookSearchFragment.BookUserInputBridge {
 
-    private val network by lazy {
-        Network()
-    }
+    private lateinit var viewModel: BookSearchViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        viewModel =
+            ViewModelProvider(this).get(BookSearchViewModel::class.java)// Instance of BookSearchViewModel
+            // BookSearchViewModel <init>
+
+        viewModel.bookDataResult.observe(this) {
+
+        }
+
+
         //StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.LAX)
 
 //        Thread {
