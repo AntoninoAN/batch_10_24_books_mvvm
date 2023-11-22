@@ -3,18 +3,21 @@ package com.example.bookapisearch.view
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.bookapisearch.databinding.FragmentDisplayResultsBinding
 import com.example.bookapisearch.model.BookResponse
 import com.example.bookapisearch.model.BookVolumeInfo
 import com.example.bookapisearch.model.IRepository
 import com.example.bookapisearch.model.RepositoryImpl
+import com.example.bookapisearch.viewmodel.BookSearchViewModel
 import kotlinx.parcelize.Parcelize
-import java.io.Serializable
 
 class BookDisplayFragment : Fragment() {
 
@@ -22,6 +25,9 @@ class BookDisplayFragment : Fragment() {
     private val repository: IRepository by lazy { RepositoryImpl() }
     private val adapter: BookAdapter by lazy {
         BookAdapter(emptyList())
+    }
+    private val bookViewModel: BookSearchViewModel by lazy {
+        ViewModelProvider(this)[BookSearchViewModel::class.java]
     }
 
     @Parcelize
@@ -54,30 +60,67 @@ class BookDisplayFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         displayBinding.rvBookResult.layoutManager = GridLayoutManager(context, 2)
         displayBinding.rvBookResult.adapter = adapter
+        setupObservables()
+    }
+
+    private val observerNetworkConnectivity: Observer<BookResponse> = Observer {
+        Log.d("TONY", "Observing Forever: ")
+    }
+
+    /**
+     *
+     */
+    private fun setupObservables() {
+        bookViewModel.bookDataResult.observeForever(observerNetworkConnectivity)
+
+        bookViewModel.bookDataResult.observe(viewLifecycleOwner) {
+            adapter.updateDataSet(
+                it.items?.map { bookItems ->
+                            BookVolumeInfo(
+                                bookItems.volumeInfo?.title,
+                                bookItems.volumeInfo?.imageLinks
+                            )
+                        } ?: emptyList()
+            )
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        bookViewModel.bookDataResult.removeObserver(observerNetworkConnectivity)
     }
 
     override fun onStart() {
         super.onStart()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getParcelable(BOOK_SEARCH_ARGS, BookSearchArguments::class.java)?.let {
-                repository.searchBookByBookTitle(it.bookTitle, it.bookType, it.maxResults) {
-                    // todo update adapter
-                    adapter.updateDataSet(
-                        it.items?.map { bookItems ->
-                            BookVolumeInfo(
-                                bookItems.volumeInfo?.title,
-                                bookItems.volumeInfo?.imageLinks
-                            )
-                        } ?: emptyList()
-                    )
-                }
-
+                bookViewModel.searchBooksByArgs(
+                    it.bookTitle,
+                    it.bookType,
+                    it.maxResults
+                )
+//                repository.searchBookByBookTitle(it.bookTitle, it.bookType, it.maxResults) {
+//                    // todo update adapter
+//                    adapter.updateDataSet(
+//                        it.items?.map { bookItems ->
+//                            BookVolumeInfo(
+//                                bookItems.volumeInfo?.title,
+//                                bookItems.volumeInfo?.imageLinks
+//                            )
+//                        } ?: emptyList()
+//                    )
+//                }
             }
         } else {
             arguments?.getParcelable<BookSearchArguments>(BOOK_SEARCH_ARGS)?.let {
-                repository.searchBookByBookTitle(it.bookTitle, it.bookType, it.maxResults) {
-
-                }
+                bookViewModel.searchBooksByArgs(
+                    it.bookTitle,
+                    it.bookType,
+                    it.maxResults
+                )
+//                repository.searchBookByBookTitle(it.bookTitle, it.bookType, it.maxResults) {
+//
+//                }
             }
         }
     }

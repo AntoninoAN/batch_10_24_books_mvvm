@@ -1,5 +1,6 @@
 package com.example.bookapisearch.view
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -21,7 +22,8 @@ class BookAdapter(private var dataSet: List<BookVolumeInfo>) :
     class BookListVH(private val binding: ItemLayoutBooksBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun onBind(bookItem: BookVolumeInfo, openDetails: (BookVolumeInfo) -> Unit) {
+        fun onBind(bookItem: BookVolumeInfo,
+                   openDetails: (BookVolumeInfo) -> Unit) {
             binding.apply {
                 tvBookTitle.text =
                     binding.root.context.getString(R.string.book_title_header, bookItem.title)
