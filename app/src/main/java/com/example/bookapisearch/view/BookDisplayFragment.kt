@@ -99,17 +99,6 @@ class BookDisplayFragment : Fragment() {
                     it.bookType,
                     it.maxResults
                 )
-//                repository.searchBookByBookTitle(it.bookTitle, it.bookType, it.maxResults) {
-//                    // todo update adapter
-//                    adapter.updateDataSet(
-//                        it.items?.map { bookItems ->
-//                            BookVolumeInfo(
-//                                bookItems.volumeInfo?.title,
-//                                bookItems.volumeInfo?.imageLinks
-//                            )
-//                        } ?: emptyList()
-//                    )
-//                }
             }
         } else {
             arguments?.getParcelable<BookSearchArguments>(BOOK_SEARCH_ARGS)?.let {
